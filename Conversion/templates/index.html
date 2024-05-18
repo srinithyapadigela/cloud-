@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapid Document Conversion</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+    }
+
+    header {
+        font-family: Bookman Old Style;
+        width: 100%;
+        padding: 10px 0;
+        background-color: #B6D0E2;
+        color: #000;
+        text-align: center;
+        font-size: 40px;
+    }
+
+    .container {
+        max-width: 700px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+        margin: auto;
+    }
+
+    .upload-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #007bff;
+        color: #fff;
+        text-align: center;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    .upload-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .messages {
+        margin-top: 20px;
+    }
+
+    .messages p {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .error {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    #download-btn {
+        display: none;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    #download-btn:hover {
+        background-color: #0056b3;
+    }
+
+    footer {
+        width: 100%;
+        padding: 20px 0;
+        background-color: #B6D0E2;
+        text-align: center;
+        color: #000;
+        position: absolute;
+        bottom: 0;
+    }
+</style>
+</head>
+<body>
+<header>
+    Rapid Document Conversion
+</header>
+<div class="container">
+    <div class="messages" id="messages"></div>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="file" name="file" accept=".pdf,.doc,.docx" required>
+        <button type="submit" class="upload-btn">Convert File</button>
+    </form>
+    <button id="download-btn">Download Converted File</button>
+</div>
+<footer> © 2024 Rapid Document Conversion </footer>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData();
+        const fileField = document.querySelector('input[type="file"]');
+
+        formData.append('file', fileField.files[0]);
+
+        const response = await fetch('/convert', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        const messages = document.getElementById('messages');
+        const downloadBtn = document.getElementById('download-btn');
+        messages.innerHTML = '';
+
+        if (response.ok) {
+            messages.innerHTML = `<p class="success">${result.message}</p>`;
+            downloadBtn.style.display = 'block';
+            downloadBtn.setAttribute('onclick', `location.href='/download/${result.output_file}'`);
+        } else {
+            messages.innerHTML = `<p class="error">Error: ${result.error}</p>`;
+        }
+    });
+</script>
+</body>
+</html>
