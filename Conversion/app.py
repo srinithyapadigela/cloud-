@@ -17,12 +17,17 @@ s3 = boto3.client('s3')
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+def create_directories():
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['CONVERTED_FOLDER'], exist_ok=True)
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/convert', methods=['POST'])
 def convert_file():
+    create_directories()
     if 'file' not in request.files:
         return jsonify(error='No file part'), 400
 
